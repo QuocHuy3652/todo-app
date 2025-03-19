@@ -1,6 +1,5 @@
 package com.huydevcorn.todo_app.dto.request;
 
-import com.huydevcorn.todo_app.enums.TaskPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

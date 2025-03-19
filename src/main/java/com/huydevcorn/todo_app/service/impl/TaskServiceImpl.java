@@ -14,7 +14,6 @@ import com.huydevcorn.todo_app.repository.TaskRepository;
 import com.huydevcorn.todo_app.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,6 @@ import java.util.Arrays;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class TaskServiceImpl implements TaskService {
     TaskRepository taskRepository;
     TaskMapper taskMapper;
@@ -41,7 +39,6 @@ public class TaskServiceImpl implements TaskService {
                 throw new AppException(ErrorCode.INVALID_PRIORITY);
             }
             priority = TaskPriority.valueOf(request.getPriority().toUpperCase());
-            log.error("Priority: {}", priority);
         }
         Task newTask = Task.builder()
                 .title(request.getTitle())
@@ -130,6 +127,4 @@ public class TaskServiceImpl implements TaskService {
                 .results(taskPage.map(taskMapper::toTaskResponse).getContent())
                 .build();
     }
-
-
 }

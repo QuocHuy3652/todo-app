@@ -21,6 +21,12 @@ public enum ErrorCode {
 
     INVALID_PAGE(HttpStatus.BAD_REQUEST.value(), "Page must be greater than or equal to 1", HttpStatus.BAD_REQUEST),
     INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "Page size must be greater than or equal to 1", HttpStatus.BAD_REQUEST),
+
+    DEPENDENT_TASK_IDS_ARE_REQUIRED(HttpStatus.BAD_REQUEST.value(), "Dependent task ids are required", HttpStatus.BAD_REQUEST),
+    TASK_CANNOT_DEPEND_ON_ITSELF(HttpStatus.BAD_REQUEST.value(), "Task cannot depend on itself", HttpStatus.BAD_REQUEST),
+    DEPENDENT_TASK_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Dependent task not found", HttpStatus.NOT_FOUND),
+    DO_NOT_HAVE_ANY_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Task do not have any dependency", HttpStatus.BAD_REQUEST),
+    CIRCULAR_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Circular dependency detected", HttpStatus.BAD_REQUEST),
     ;
 
     int code;

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16.8-alpine3.20
+    container_name: todo-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: "${SPRING_DATASOURCE_USERNAME:-postgres}"
+      POSTGRES_PASSWORD: "${SPRING_DATASOURCE_PASSWORD}"
+      POSTGRES_DB: "${SPRING_DATASOURCE_DATABASE}"
+    ports:
+      - "5432:5432"
+    networks:
+      - todo_network
+    volumes:
+      - todo_postgres_data:/var/lib/postgresql/data
+
+networks:
+  todo_network:
+
+volumes:
+  todo_postgres_data:

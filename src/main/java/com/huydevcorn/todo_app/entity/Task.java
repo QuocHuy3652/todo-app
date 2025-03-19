@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -29,19 +28,26 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    @Column(nullable = false)
+    @Column(name = "due_date")
     LocalDateTime dueDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    int priority = TaskPriority.MEDIUM.getValue();
+    TaskPriority priority = TaskPriority.MEDIUM;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     TaskStatus status = TaskStatus.PENDING;
 
     @CreationTimestamp
+    @Column(name = "create_at", updatable = false)
     LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    LocalDateTime updatedAt;
+    @Column(name = "update_at", insertable = false)
+    private LocalDateTime updatedAt = null;
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

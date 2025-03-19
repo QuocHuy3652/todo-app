@@ -9,12 +9,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public enum TaskPriority {
-    LOW(1, "Low, not important"),
-    MEDIUM(2, "Medium, normal, this is the default priority"),
-    HIGH(3, "High, important"),
-    URGENT(4, "Urgent, very important"),
-    CRITICAL(5, "Critical, extremely important, must be done immediately"),
+    LOW(1, "Low", "Not important"),
+    MEDIUM(2, "Medium", "Normal, this is the default priority"),
+    HIGH(3, "High" , "Important"),
+    URGENT(4, "Urgent", "Very important"),
+    CRITICAL(5, "Critical", "Extremely important, must be done immediately"),
     ;
     int value;
+    String priority;
     String description;
 }

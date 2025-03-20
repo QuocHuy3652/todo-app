@@ -11,6 +11,7 @@ import com.huydevcorn.todo_app.enums.TaskStatus;
 import com.huydevcorn.todo_app.exception.AppException;
 import com.huydevcorn.todo_app.exception.ErrorCode;
 import com.huydevcorn.todo_app.mapper.TaskMapper;
+import com.huydevcorn.todo_app.notification.NotificationScheduler;
 import com.huydevcorn.todo_app.repository.TaskDependencyRepository;
 import com.huydevcorn.todo_app.repository.TaskRepository;
 import com.huydevcorn.todo_app.service.TaskService;
@@ -25,6 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -35,6 +37,7 @@ public class TaskServiceImpl implements TaskService {
     TaskRepository taskRepository;
     TaskMapper taskMapper;
     TaskDependencyRepository taskDependencyRepository;
+    NotificationScheduler notificationScheduler;
 
     @Override
     public TaskResponse createTask(TaskCreationRequest request) {
@@ -47,6 +50,9 @@ public class TaskServiceImpl implements TaskService {
             }
             priority = TaskPriority.valueOf(request.getPriority().toUpperCase());
         }
+        if (request.getDueDate() != null && request.getDueDate().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.DUE_DATE_MUST_BE_AFTER_NOW);
+        }
         Task newTask = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -55,6 +61,13 @@ public class TaskServiceImpl implements TaskService {
         newTask.setStatus(TaskStatus.PENDING);
         newTask.setPriority(priority);
         newTask = taskRepository.save(newTask);
+
+        notificationScheduler.scheduleTask(
+                newTask.getId(),
+                newTask.getTitle(),
+                newTask.getDueDate()
+        );
+
         return taskMapper.toTaskResponse(newTask);
     }
 
@@ -80,10 +93,21 @@ public class TaskServiceImpl implements TaskService {
             updateTask.setPriority(TaskPriority.valueOf(request.getPriority().toUpperCase()));
         }
         if (request.getDueDate() != null) {
+            if (request.getDueDate().isBefore(LocalDateTime.now())) {
+                throw new AppException(ErrorCode.DUE_DATE_MUST_BE_AFTER_NOW);
+            }
             updateTask.setDueDate(request.getDueDate());
         }
 
         updateTask = taskRepository.save(updateTask);
+
+        notificationScheduler.cancelTask(id);
+        notificationScheduler.scheduleTask(
+                updateTask.getId(),
+                updateTask.getTitle(),
+                updateTask.getDueDate()
+        );
+
         return taskMapper.toTaskResponse(updateTask);
     }
 
@@ -102,6 +126,7 @@ public class TaskServiceImpl implements TaskService {
             throw new AppException(ErrorCode.CAN_NOT_DELETE_TASK_WITH_DEPENDENCY);
         }
         taskRepository.delete(task);
+        notificationScheduler.cancelTask(id);
     }
 
     @Override

@@ -32,6 +32,10 @@ public enum ErrorCode {
     START_DATE_MUST_BE_BEFORE_END_DATE(HttpStatus.BAD_REQUEST.value(), "Start date must be before end date", HttpStatus.BAD_REQUEST),
     CAN_NOT_UPDATE_STATUS_OF_TASK_WITH_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Cannot update status of task that has uncompleted dependencies", HttpStatus.BAD_REQUEST),
     CAN_NOT_SET_DEPENDENCY_FOR_NON_PENDING_TASK(HttpStatus.BAD_REQUEST.value(), "Cannot set dependency for a non-pending task", HttpStatus.BAD_REQUEST),
+    DUE_DATE_MUST_BE_AFTER_NOW(HttpStatus.BAD_REQUEST.value(), "Due date must be after now", HttpStatus.BAD_REQUEST),
+
+
+
     ;
 
     int code;

@@ -11,11 +11,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Global exception handler for handling various exceptions across the application.
+ */
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
+    /**
+     * Handles uncategorized exceptions.
+     *
+     * @return a response entity with a generic error message and status code
+     */
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse<String>> handlingException() {
         ApiResponse<String> apiResponse = new ApiResponse<>();
@@ -24,6 +32,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ErrorCode.UNCATEGORIZED.getHttpStatusCode()).body(apiResponse);
     }
 
+    /**
+     * Handles application-specific exceptions.
+     *
+     * @param appException the application-specific exception
+     * @return a response entity with the error code and message from the exception
+     */
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<String>> handlingAppException(AppException appException) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
@@ -32,6 +46,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(appException.getErrorCode().getHttpStatusCode()).body(apiResponse);
     }
 
+    /**
+     * Handles validation exceptions for method arguments.
+     *
+     * @param exception the validation exception
+     * @return a response entity with the error code and message from the exception
+     */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse<String>> handlingValidation(MethodArgumentNotValidException exception) {
         String errorKey = Objects.requireNonNull(exception.getFieldError()).getDefaultMessage();
@@ -50,6 +70,13 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    /**
+     * Maps attributes to the error message.
+     *
+     * @param message the error message
+     * @param attribute the attributes to map
+     * @return the mapped error message
+     */
     private String mapAttribute(String message, Map<String, Object> attribute) {
         String minValue = String.valueOf(attribute.get(MIN_ATTRIBUTE));
         return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);

@@ -3,6 +3,7 @@ package com.huydevcorn.todo_app.service.impl;
 import com.huydevcorn.todo_app.dto.response.TaskDependencyResponse;
 import com.huydevcorn.todo_app.entity.Task;
 import com.huydevcorn.todo_app.entity.TaskDependency;
+import com.huydevcorn.todo_app.enums.TaskStatus;
 import com.huydevcorn.todo_app.exception.AppException;
 import com.huydevcorn.todo_app.exception.ErrorCode;
 import com.huydevcorn.todo_app.repository.TaskDependencyRepository;
@@ -33,6 +34,9 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new AppException(ErrorCode.TASK_NOT_FOUND));
+        if (task.getStatus() != TaskStatus.PENDING) {
+            throw new AppException(ErrorCode.CAN_NOT_SET_DEPENDENCY_FOR_NON_PENDING_TASK);
+        }
 
         if (dependentTaskIds.contains(taskId)) {
             throw new AppException(ErrorCode.TASK_CANNOT_DEPEND_ON_ITSELF);
@@ -64,6 +68,8 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
 
         if (!newDependencies.isEmpty()) {
             taskDependencyRepository.saveAll(newDependencies);
+        } else {
+            throw new AppException(ErrorCode.DEPENDENCIES_ALREADY_EXIST);
         }
     }
 
@@ -90,6 +96,7 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new AppException(ErrorCode.TASK_NOT_FOUND));
         Set<TaskDependency> dependenciesToRemove = taskDependencyRepository.findByTaskAndDependsOnTaskIdIn(task, dependentTaskIds);
+
         taskDependencyRepository.deleteAll(dependenciesToRemove);
     }
 

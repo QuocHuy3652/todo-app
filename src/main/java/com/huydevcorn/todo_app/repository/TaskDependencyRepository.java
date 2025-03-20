@@ -15,4 +15,6 @@ public interface TaskDependencyRepository extends JpaRepository<TaskDependency, 
     Set<Long> findDependsOnIdsByTaskId(Long taskId);
     Set<TaskDependency> findByTaskAndDependsOnTaskIdIn(Task task, Set<Long> dependsOnTaskIds);
     Set<TaskDependency> findAllByTask(Task task);
+    boolean existsByTaskId(Long taskId);
+    boolean existsByDependsOnTaskId(Long dependsOnTaskId);
 }

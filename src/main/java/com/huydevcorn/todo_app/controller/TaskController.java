@@ -7,11 +7,16 @@ import com.huydevcorn.todo_app.dto.response.PaginationResponse;
 import com.huydevcorn.todo_app.dto.response.TaskResponse;
 import com.huydevcorn.todo_app.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,10 +46,41 @@ public class TaskController {
     @Operation(summary = "Get all tasks")
     public ApiResponse<PaginationResponse<TaskResponse>> getAllTasks(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false)
+            @Parameter(
+                    schema = @Schema(
+                            example = "'LOW', 'MEDIUM', 'HIGH', 'URGENT', or 'CRITICAL'"
+                    )
+            )
+            String priority,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @Parameter(
+                    schema = @Schema(
+                            example = "2025-03-20"
+                    )
+            )
+            LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @Parameter(
+                    schema = @Schema(
+                            example = "2025-03-20"
+                    )
+            )
+            LocalDate endDate,
+            @RequestParam(required = false)
+            @Parameter(
+                    schema = @Schema(
+                            example = "'PENDING', 'IN_PROGRESS', or 'DONE'"
+                    )
+            )
+            String status
     ) {
         return ApiResponse.<PaginationResponse<TaskResponse>>builder()
-                .data(taskService.getTasks(page, size))
+                .data(taskService.getTasks(page, size, title, priority, startDate, endDate, status))
                 .build();
     }
 

@@ -27,6 +27,11 @@ public enum ErrorCode {
     DEPENDENT_TASK_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "Dependent task not found", HttpStatus.NOT_FOUND),
     DO_NOT_HAVE_ANY_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Task do not have any dependency", HttpStatus.BAD_REQUEST),
     CIRCULAR_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Circular dependency detected", HttpStatus.BAD_REQUEST),
+    DEPENDENCIES_ALREADY_EXIST(HttpStatus.BAD_REQUEST.value(), "Dependencies already exist", HttpStatus.BAD_REQUEST),
+    CAN_NOT_DELETE_TASK_WITH_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Cannot delete task that has dependencies", HttpStatus.BAD_REQUEST),
+    START_DATE_MUST_BE_BEFORE_END_DATE(HttpStatus.BAD_REQUEST.value(), "Start date must be before end date", HttpStatus.BAD_REQUEST),
+    CAN_NOT_UPDATE_STATUS_OF_TASK_WITH_DEPENDENCY(HttpStatus.BAD_REQUEST.value(), "Cannot update status of task that has uncompleted dependencies", HttpStatus.BAD_REQUEST),
+    CAN_NOT_SET_DEPENDENCY_FOR_NON_PENDING_TASK(HttpStatus.BAD_REQUEST.value(), "Cannot set dependency for a non-pending task", HttpStatus.BAD_REQUEST),
     ;
 
     int code;

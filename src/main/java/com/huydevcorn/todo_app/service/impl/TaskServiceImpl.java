@@ -14,6 +14,7 @@ import com.huydevcorn.todo_app.mapper.TaskMapper;
 import com.huydevcorn.todo_app.notification.NotificationScheduler;
 import com.huydevcorn.todo_app.repository.TaskDependencyRepository;
 import com.huydevcorn.todo_app.repository.TaskRepository;
+import com.huydevcorn.todo_app.service.RedisService;
 import com.huydevcorn.todo_app.service.TaskService;
 import com.huydevcorn.todo_app.utils.TaskSpecification;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,8 @@ public class TaskServiceImpl implements TaskService {
     TaskMapper taskMapper;
     TaskDependencyRepository taskDependencyRepository;
     NotificationScheduler notificationScheduler;
+
+    RedisService redisService;
 
     @Override
     public TaskResponse createTask(TaskCreationRequest request) {
@@ -115,6 +118,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponse getTask(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.TASK_NOT_FOUND));
+        redisService.setValue("task:" + id, "test redis connection");
         return taskMapper.toTaskResponse(task);
     }
 

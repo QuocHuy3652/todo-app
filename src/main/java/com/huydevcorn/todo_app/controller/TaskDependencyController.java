@@ -11,14 +11,27 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
+/**
+ * Controller for handling task dependency - related operations.
+ */
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/dependencies")
 @Tag(name = "Task dependencies", description = "Task dependencies API")
 public class TaskDependencyController {
+    /**
+     * Service for task dependency-related operations.
+     */
     TaskDependencyService taskDependencyService;
 
+    /**
+     * Endpoint to create dependencies for a task.
+     *
+     * @param taskId the ID of the task
+     * @param dependentTaskId the IDs of the tasks that the task depends on
+     * @return a message indicating the result
+     */
     @PostMapping("/{taskId}")
     @Operation(summary = "Create dependencies")
     public ApiResponse<String> createDependency(
@@ -31,6 +44,12 @@ public class TaskDependencyController {
                 .build();
     }
 
+    /**
+     * Endpoint to get the dependencies of a task.
+     *
+     * @param taskId the ID of the task
+     * @return the task dependency response
+     */
     @GetMapping("/{taskId}")
     @Operation(summary = "Get dependencies of a task")
     public ApiResponse<TaskDependencyResponse> getDependency(
@@ -41,6 +60,13 @@ public class TaskDependencyController {
                 .build();
     }
 
+    /**
+     * Endpoint to delete some dependencies of a task.
+     *
+     * @param taskId the ID of the task
+     * @param dependentTaskId the IDs of the tasks to remove from dependencies
+     * @return a message indicating the result
+     */
     @DeleteMapping("/{taskId}")
     @Operation(summary = "Delete some dependencies")
     public ApiResponse<String> deleteDependency(
@@ -53,6 +79,12 @@ public class TaskDependencyController {
                 .build();
     }
 
+    /**
+     * Endpoint to delete all dependencies of a task.
+     *
+     * @param taskId the ID of the task
+     * @return a message indicating the result
+     */
     @DeleteMapping("/all/{taskId}")
     @Operation(summary = "Delete all dependencies")
     public ApiResponse<String> deleteAllDependencies(@PathVariable Long taskId) {

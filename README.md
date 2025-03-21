@@ -156,3 +156,6 @@ node websocket-client.js
 6. You can see the logs in the console when the connection is established and the first message is sent.
 
 7. Create a task with a due date near but not overdue 1 hour from now to receive the upcoming notification.
+
+
+### Hope you run the application successfully. Good luck!

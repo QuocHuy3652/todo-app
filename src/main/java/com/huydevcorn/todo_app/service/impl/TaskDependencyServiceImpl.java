@@ -1,21 +1,28 @@
 package com.huydevcorn.todo_app.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.huydevcorn.todo_app.dto.response.TaskDependencyResponse;
 import com.huydevcorn.todo_app.entity.Task;
 import com.huydevcorn.todo_app.entity.TaskDependency;
+import com.huydevcorn.todo_app.enums.RedisPrefix;
 import com.huydevcorn.todo_app.enums.TaskStatus;
 import com.huydevcorn.todo_app.exception.AppException;
 import com.huydevcorn.todo_app.exception.ErrorCode;
 import com.huydevcorn.todo_app.repository.TaskDependencyRepository;
 import com.huydevcorn.todo_app.repository.TaskRepository;
+import com.huydevcorn.todo_app.service.RedisService;
 import com.huydevcorn.todo_app.service.TaskDependencyService;
+import com.huydevcorn.todo_app.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +35,7 @@ import java.util.stream.Collectors;
 public class TaskDependencyServiceImpl implements TaskDependencyService {
     TaskRepository taskRepository;
     TaskDependencyRepository taskDependencyRepository;
+    RedisService redisService;
 
     @Override
     public void addDependencies(Long taskId, Set<Long> dependentTaskIds) {
@@ -81,6 +89,10 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
         // Save new dependencies if any, otherwise throw an exception
         if (!newDependencies.isEmpty()) {
             taskDependencyRepository.saveAll(newDependencies);
+
+            // Delete cached dependencies
+            redisService.deleteByPattern(RedisUtils.withPrefix(RedisPrefix.DEPENDENCIES.getPrefix(), "*"));
+            redisService.deleteByPattern(RedisUtils.withPrefix(RedisPrefix.CHECK_CIRCLE.getPrefix(), "*"));
         } else {
             throw new AppException(ErrorCode.DEPENDENCIES_ALREADY_EXIST);
         }
@@ -118,6 +130,10 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
         // Find and remove the specified dependencies
         Set<TaskDependency> dependenciesToRemove = taskDependencyRepository.findByTaskAndDependsOnTaskIdIn(task, dependentTaskIds);
         taskDependencyRepository.deleteAll(dependenciesToRemove);
+
+        // Delete cached dependencies
+        redisService.deleteByPattern(RedisUtils.withPrefix(RedisPrefix.DEPENDENCIES.getPrefix(), "*"));
+        redisService.deleteByPattern(RedisUtils.withPrefix(RedisPrefix.CHECK_CIRCLE.getPrefix(), "*"));
     }
 
     @Override
@@ -129,6 +145,10 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
         // Find and remove all dependencies
         Set<TaskDependency> dependenciesToRemove = taskDependencyRepository.findAllByTask(task);
         taskDependencyRepository.deleteAll(dependenciesToRemove);
+
+        // Delete cached dependencies
+        redisService.deleteByPattern(RedisUtils.withPrefix(RedisPrefix.DEPENDENCIES.getPrefix(), "*"));
+        redisService.deleteByPattern(RedisUtils.withPrefix(RedisPrefix.CHECK_CIRCLE.getPrefix(), "*"));
     }
 
 
@@ -144,6 +164,15 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
             Task task,
             Set<TaskDependencyResponse> dependencies
     ) {
+        // Check if dependencies are already cached
+        String key = RedisUtils.withPrefix(RedisPrefix.DEPENDENCIES.getPrefix(), task.getId().toString());
+        if (redisService.hasKey(key)) {
+            TypeReference<List<TaskDependencyResponse>> typeRef = new TypeReference<>() {};
+            List<TaskDependencyResponse> cachedDependencies = redisService.getObject(key, typeRef);
+            dependencies.addAll(new HashSet<>(cachedDependencies));
+            return;
+        }
+
         // Find direct dependencies of the task
         Set<TaskDependency> directDependencies = taskDependencyRepository.findByTask(task);
 
@@ -162,6 +191,9 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
 
             dependencies.add(response);
         }
+
+        // Cache the dependencies
+        redisService.setObject(key, new ArrayList<>(dependencies),1, TimeUnit.HOURS);
     }
 
     /**
@@ -200,8 +232,19 @@ public class TaskDependencyServiceImpl implements TaskDependencyService {
         // Add the current task to the stack
         stack.add(currentTaskId);
 
-        // Retrieve dependencies of the current task
-        Set<Long> dependencies = taskDependencyRepository.findDependsOnIdsByTaskId(currentTaskId);
+        // Cache key for dependencies of this task
+        String key = RedisUtils.withPrefix(RedisPrefix.CHECK_CIRCLE.getPrefix(), currentTaskId.toString());
+
+        Set<Long> dependencies;
+        if (redisService.hasKey(key)) {
+            // Get from cache
+            TypeReference<List<Long>> typeRef = new TypeReference<>() {};
+            dependencies = new HashSet<>(redisService.getObject(key, typeRef));
+        } else {
+            // Query database and cache result
+            dependencies = taskDependencyRepository.findDependsOnIdsByTaskId(currentTaskId);
+            redisService.setObject(key, new ArrayList<>(dependencies), 1, TimeUnit.HOURS);
+        }
 
         // Recursively check for cycles in the dependencies
         for (Long dependentTaskId : dependencies) {

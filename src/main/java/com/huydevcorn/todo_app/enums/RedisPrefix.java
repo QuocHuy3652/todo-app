@@ -19,6 +19,12 @@ public enum RedisPrefix {
     // Prefix for task list cache.
     TASKS("tasks:", "Use for task list cache"),
 
+    // Prefix for task dependency cache.
+    DEPENDENCIES("dependencies:", "Use for task dependency cache"),
+
+    // Prefix for check circle cache.
+    CHECK_CIRCLE("check_circle:", "Use for check circle cache"),
+
     ;
 
     String prefix;

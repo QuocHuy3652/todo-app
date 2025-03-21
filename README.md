@@ -38,6 +38,7 @@ SPRING_DATASOURCE_DATABASE=todo_app
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/todo_app
 SPRING_REDIS_PASSWORD=root
 SPRING_REDIS_HOST=localhost
+SPRING_REDIS_PORT=6379
 ```
 
 You can change the values of **SPRING_DATASOURCE_PASSWORD** and **SPRING_REDIS_PASSWORD** to your desired password.
@@ -47,6 +48,7 @@ You can change the values of **SPRING_DATASOURCE_PASSWORD** and **SPRING_REDIS_P
 ```bash
 docker-compose up -d
 ```
+This command will build the images and run the containers in the background. This process may take a few minutes.
 
 ### 3.3 Access the Application
 
@@ -55,7 +57,11 @@ docker-compose up -d
 
 ## 4️⃣ Deployment On Cloud
 
-
+- PostgreSQL database is deployed on **Supabase** (https://supabase.com/).
+- Redis is deployed on **RedisLabs** (https://redis.io/).
+- The backend is deployed on **Railway**.
+  - **Application**: [https://todo-app-production-81cd.up.railway.app/api/v1](https://todo-app-production-81cd.up.railway.app/api/v1)
+  - **API Documentation**: [https://todo-app-production-81cd.up.railway.app/api/v1/swagger-ui/index.html](https://todo-app-production-81cd.up.railway.app/api/v1/swagger-ui/index.html#/)
 
 ## 5️⃣ Main Features
 

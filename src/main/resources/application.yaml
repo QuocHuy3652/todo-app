@@ -26,6 +26,8 @@ spring:
       port: 6379
       timeout: 60000
       password: ${SPRING_REDIS_PASSWORD}
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
 
 springdoc:
   api-docs:

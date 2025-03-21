@@ -4,6 +4,15 @@ server:
     context-path: /api/v1
   forward-headers-strategy: native
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+  endpoint:
+    health:
+      show-details: always
+
 spring:
   application:
     name: todo-app

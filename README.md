@@ -59,9 +59,9 @@ This command will build the images and run the containers in the background. Thi
 
 - PostgreSQL database is deployed on **Supabase** (https://supabase.com/).
 - Redis is deployed on **RedisLabs** (https://redis.io/).
-- The backend is deployed on **Railway**.
-  - **Application**: [https://todo-app-production-81cd.up.railway.app/api/v1](https://todo-app-production-81cd.up.railway.app/api/v1)
-  - **API Documentation**: [https://todo-app-production-81cd.up.railway.app/api/v1/swagger-ui/index.html](https://todo-app-production-81cd.up.railway.app/api/v1/swagger-ui/index.html#/)
+- The backend is deployed on **Render**.
+  - **Application**: [https://todo-app-fr56.onrender.com/api/v1](https://todo-app-fr56.onrender.com/api/v1)
+  - **API Documentation**: [https://todo-app-fr56.onrender.com/api/v1/swagger-ui/index.html](https://todo-app-fr56.onrender.com/api/v1/swagger-ui/index.html)
 
 ## 5️⃣ Main Features
 

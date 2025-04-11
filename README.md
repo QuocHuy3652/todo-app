@@ -62,6 +62,8 @@ This command will build the images and run the containers in the background. Thi
 - The backend is deployed on **Render**.
   - **Application**: [https://todo-app-fr56.onrender.com/api/v1](https://todo-app-fr56.onrender.com/api/v1)
   - **API Documentation**: [https://todo-app-fr56.onrender.com/api/v1/swagger-ui/index.html](https://todo-app-fr56.onrender.com/api/v1/swagger-ui/index.html)
+ 
+*note: Due to using a free hosting version, the server will spin down after a period of inactivity, which can delay the first request by 1 minute or more. Please call the API at [API Documentation](https://todo-app-fr56.onrender.com/api/v1/swagger-ui/index.html) on a browser a few minutes beforehand to ensure a smoother experience.
 
 ## 5️⃣ Main Features
 
